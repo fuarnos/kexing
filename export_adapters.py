@@ -78,21 +78,98 @@ def render_profile(profile: dict) -> str:
     return '\n'.join(text) + '\n'
 
 
-def start_page(configs: dict, rules: str, knowledge: str) -> str:
+def start_page(configs: dict, rules: str, knowledge: str, public_profile: bool = True) -> str:
+    single = len(configs) == 1
+    heading = next(iter(configs.values()))['name'] + '版，直接开始。' if single else '选个平台，直接开始。'
+    guide = 'README.md' if single else 'PLATFORMS.md'
     data = json.dumps({'platforms': configs, 'rules': rules, 'knowledge': knowledge}, ensure_ascii=False)
     data = data.replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026')
-    return '''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    page = '''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>可幸 · 开源多平台适配</title><style>
 *{box-sizing:border-box}body{margin:0;background:#f3f4ee;color:#233d32;font:17px/1.75 system-ui,"Microsoft YaHei",sans-serif}main{max-width:950px;margin:55px auto;padding:0 25px}h1{font-size:40px;line-height:1.25}section{background:#fffef9;padding:28px;border-radius:18px;border:1px solid #dce2d8;margin:24px 0}select,button{font:inherit;border-radius:9px;padding:10px 15px;border:1px solid #cad7ca}select{background:white;width:100%;color:#233d32}button{background:#285d44;color:white;cursor:pointer;margin:6px 10px 6px 0}button.alt{background:#e9efe5;color:#233d32}textarea{width:100%;height:180px;border:1px solid #dce2d8;padding:10px;color:#233d32;background:#f8faf4}#status{min-height:28px;color:#285d44}li{margin:10px 0}a{color:#285d44}.small{font-size:14px;color:#66756b}code{background:#edf1e6;padding:2px 5px;word-break:break-word}
 </style></head><body><main><p class="small">可幸的数字永生计划 · MIT 开源 · 公开表达层</p><h1>选个平台，直接开始。</h1><p>这页自带公开风格规则与新写示例。没有私人聊天或人物档案，不会自动向任何平台发送资料。</p>
-<section><label for="platform">你用哪个平台？</label><select id="platform"></select><h2 id="title"></h2><p id="steps"></p><ol><li>点“复制适配文本”。</li><li>在目标平台新建聊天，粘贴并发送。</li><li>接着发：把下面这段改成自然的微信语气，保留条件和承诺范围：……</li></ol><button id="copy">复制适配文本</button><button id="instructions" class="alt">复制项目指令</button><button id="knowledge" class="alt">复制知识资料</button><p id="status" role="status"></p><details><summary>复制不了？手动全选复制</summary><textarea id="text" readonly aria-label="适配文本"></textarea><p class="small">点文本框 → Ctrl+A → Ctrl+C；去聊天框 Ctrl+V。</p></details></section>
+<section><label for="platform">你用哪个平台？</label><select id="platform"></select><h2 id="title"></h2><p id="steps"></p><p><a id="download" href="#">只下载这个平台的独立包</a></p><ol><li>点“复制适配文本”。</li><li>在目标平台新建聊天，粘贴并发送。</li><li>接着发：把下面这段改成自然的微信语气，保留条件和承诺范围：……</li></ol><button id="copy">复制适配文本</button><button id="instructions" class="alt">复制项目指令</button><button id="knowledge" class="alt">复制知识资料</button><p id="status" role="status"></p><details><summary>复制不了？手动全选复制</summary><textarea id="text" readonly aria-label="适配文本"></textarea><p class="small">点文本框 → Ctrl+A → Ctrl+C；去聊天框 Ctrl+V。</p></details></section>
 <p>长期使用、原生Skill与本地模型的步骤，请看随包的 <a href="PLATFORMS.md">PLATFORMS.md</a>；也可以看 <a href="https://github.com/fuarnos/kexing/blob/main/PLATFORMS.md">GitHub图文排版版教程</a>。</p><p class="small">支持格式不代表已在每家账号实测。所有生成内容仍需本人审阅；本项目没有模型权重或模仿准确率承诺。</p></main>
 <script id="data" type="application/json">DATA</script><script>
 'use strict';const D=JSON.parse(document.getElementById('data').textContent),G=id=>document.getElementById(id);for(const [key,p] of Object.entries(D.platforms)){const op=document.createElement('option');op.value=key;op.textContent=p.name;G('platform').append(op)}
-function show(){const p=D.platforms[G('platform').value];G('title').textContent=p.name+' · '+p.format;G('steps').textContent=p.quick_start;G('text').value=p.prompt;G('status').textContent=''}
+function show(){const p=D.platforms[G('platform').value];G('title').textContent=p.name+' · '+p.format;G('steps').textContent=p.quick_start;G('text').value=p.prompt;G('download').href=p.download_url||'#';G('download').hidden=!p.download_url;G('download').textContent='下载 '+p.name+' 独立包';G('status').textContent=''}
 async function copy(value){G('text').value=value;try{if(!navigator.clipboard)throw Error('manual');await navigator.clipboard.writeText(value);G('status').textContent='已复制，请到目标平台粘贴并发送。'}catch(e){G('text').closest('details').open=true;G('text').focus();G('text').select();G('status').textContent='文本已选好，请按 Ctrl+C 复制。'}}
 G('platform').onchange=show;G('copy').onclick=()=>copy(D.platforms[G('platform').value].prompt);G('instructions').onclick=()=>copy(D.rules);G('knowledge').onclick=()=>copy(D.knowledge);show();
-</script></body></html>'''.replace('DATA', data, 1)
+</script></body></html>'''.replace('DATA', data, 1).replace('选个平台，直接开始。', heading, 1).replace('href="PLATFORMS.md"', 'href="' + guide + '"', 1).replace('>PLATFORMS.md</a>', '>' + guide + '</a>', 1)
+    if not public_profile:
+        page = page.replace('MIT 开源 · 公开表达层', '本人自有资料 · 本地导出')
+        page = page.replace('这页自带公开风格规则与新写示例。没有私人聊天或人物档案，不会自动向任何平台发送资料。', '这页包含你自行填写的资料。它不会自动上传；由你决定是否将内容粘贴给目标模型。')
+    return page
+
+
+def platform_guide(key: str, public_profile: bool = True) -> str:
+    name, _, url = PLATFORMS[key]
+    intro = '# ' + name + ' 独立使用版\n\n本包仅包含' + name + '所需的文件、教程和公开表达规则。\n\n'
+    if key == 'chatgpt':
+        steps = '1. 解压下载的ZIP，进入kexing-chatgpt文件夹。\n2. 打开ChatGPT，新建项目。\n3. 添加本包的knowledge.txt。\n4. 项目菜单“⋯”→“项目设置”，粘贴instructions.txt全文并保存。\n5. 从这个项目开始聊天，提出改写要求。\n'
+    elif key == 'claude':
+        steps = '## 直接安装Skill：不用解压\n\n1. 下载kexing-claude.zip。\n2. 在Claude打开Customize → Skills → “+”→ Create skill → Upload a skill。\n3. 直接选择刚下载的ZIP，启用kexing-profile。不要上传完整多平台包。\n\n如果界面要求开启代码执行与文件创建，按Claude当前设置处理；本技能只有文本与离线教程，没有需要运行的代码。\n\n## 想使用Project\n\n解压后进入kexing-profile文件夹。新建Project，在知识区上传knowledge.txt；Set project instructions中粘贴instructions.txt全文，保存后从项目聊天。\n'
+    elif key == 'gemini':
+        steps = '1. 解压下载的ZIP，进入kexing-gemini文件夹。\n2. 电脑打开Gemini，左侧“Gem”→新建Gem。\n3. 指令框粘贴instructions.txt全文。\n4. “知识”→添加文件→上传knowledge.txt。\n5. 保存后从这个Gem开始聊天。\n'
+    elif key == 'codex':
+        steps = '1. 解压下载的ZIP，得到kexing-profile文件夹。\n2. 在Codex中告诉它这个文件夹的本地位置，并发送：“请把这里的kexing-profile安装成我的个人skill，只安装这个文件夹。”\n3. 安装后新开聊天，输入：用 $kexing-profile 把这段话改成自然的微信语气：……\n\n技能引用的references/profile.md已随包附上，不要只复制SKILL.md。\n'
+    elif key == 'lm-studio':
+        steps = '1. 解压下载的ZIP，进入kexing-lm-studio文件夹。\n2. 打开已安装的LM Studio，载入已有的本地模型。\n3. 新建聊天，把system-prompt.txt全文放进System Prompt。\n4. 需要下次复用时，保存为自己的Preset。\n\n也可把prompt.txt作为第一条消息发送。不会下载或更换模型。\n'
+    elif key == 'ollama':
+        steps = '1. 解压下载的ZIP，进入kexing-ollama文件夹。\n2. 已装Ollama且有本地模型时，运行ollama list，记下本机模型NAME。\n3. 用记事本打开Modelfile.template，将第一行YOUR_INSTALLED_LOCAL_MODEL改为模型NAME，保存为Modelfile，注意不要变成Modelfile.txt。\n4. 在该文件夹打开终端，运行：\n\n```text\nollama create kexing-public -f ./Modelfile\nollama run kexing-public\n```\n\n本包给已有模型附加指令，不训练或下载新权重。\n'
+    else:
+        steps = '1. 解压下载的ZIP，进入kexing-' + key + '文件夹。\n2. 打开' + name + '官方App或网站，新建普通聊天。\n3. 用记事本打开prompt.txt，Ctrl+A全选，Ctrl+C复制。\n4. 到聊天框Ctrl+V粘贴并发送，随后提出改写要求。\n'
+    site = '\n官方入口：' + url + '\n' if url else ''
+    guide = intro + steps + site + '''
+## 不想配置：直接试用
+
+解压后双击“开始使用.html”，或用记事本打开prompt.txt，复制全文到新聊天即可。新聊天没保留资料时重新粘贴。
+
+## 检查有没有读对
+
+发送：“把这段改成自然微信语气：今晚没空，明天可以先看，但现在不保证做完。”
+检查是否保留这三个条件，没有新增亲密称呼或交付承诺。问它是否拥有私人记忆时，应回答没有。
+
+本公开包不含聊天原文、人物画像或私人记忆；示例是新写演示。各模型的回答仍需本人检查。
+
+源码与完整教程：https://github.com/fuarnos/kexing
+许可证：见LICENSE。无需下载其他平台的包。
+'''
+    if not public_profile:
+        guide = guide.replace('教程和公开表达规则', '教程和你自行填写的资料')
+        guide = guide.replace('问它是否拥有私人记忆时，应回答没有。', '核对它是否只使用你明确提供的资料，没有补全未知经历。')
+        guide = guide.replace('本公开包不含聊天原文、人物画像或私人记忆；示例是新写演示。', '本包使用你自行填写的资料，请按实际敏感程度保管；示例是新写演示。')
+    return guide
+
+
+def make_platform_packages(output: Path, configs: dict, knowledge: str, public_profile: bool) -> list[str]:
+    downloads = output / 'downloads'
+    downloads.mkdir()
+    packages = []
+    for key, config in configs.items():
+        # Codex and Claude ZIPs are native skills directly, never a ZIP inside another ZIP.
+        native = key in ('claude', 'codex')
+        prefix = 'kexing-profile' if native else 'kexing-' + key
+        payload = {
+            p.name: p.read_bytes() for p in (output / 'platforms' / key).iterdir()
+            if p.is_file() and p.suffix != '.zip'
+        }
+        if native:
+            root = output / 'native/kexing-profile'
+            payload.update({p.relative_to(root).as_posix(): p.read_bytes() for p in root.rglob('*') if p.is_file()})
+        payload['README.md'] = platform_guide(key, public_profile).encode('utf-8')
+        payload['LICENSE'] = (ROOT / 'LICENSE').read_bytes()
+        payload['开始使用.html'] = start_page({key: config}, RULES, knowledge, public_profile).encode('utf-8')
+        payload['SHA256SUMS.txt'] = ''.join(hashlib.sha256(data).hexdigest() + '  ' + name + '\n' for name, data in sorted(payload.items())).encode('utf-8')
+        path = downloads / ('kexing-' + key + '.zip')
+        with zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
+            for name, data in sorted(payload.items()):
+                info = zipfile.ZipInfo(prefix + '/' + name, (2026, 10, 20, 0, 0, 0))
+                info.compress_type = zipfile.ZIP_DEFLATED
+                info.external_attr = 0o644 << 16
+                archive.writestr(info, data, compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+        packages.append(str(path))
+    return packages
 
 
 def export(profile_path: Path, output: Path, base_model: str | None = None) -> dict:
@@ -149,13 +226,18 @@ description: "使用用户提供的阶段资料或可幸公开表达规则回看
         else:
             quick = '在官方App或网站新建普通聊天，把适配文本粘贴并发送；新对话若未保留资料，重新粘贴即可。'
         write(folder, 'prompt.txt', prompt)
+        if key == 'claude':
+            quick = '下载Claude独立包后可直接在Customize → Skills上传ZIP；想使用Project时，解压后取instructions.txt和knowledge.txt。'
+        elif key == 'codex':
+            quick = '下载Codex独立包并解压，将kexing-profile文件夹交给Codex安装，再用 $kexing-profile 调用。'
         configs[key] = {'name': name, 'format': fmt, 'site': url, 'quick_start': quick,
+                        'download_url': ('https://github.com/fuarnos/kexing/raw/refs/heads/main/kexing-' + key + '.zip') if is_public else '',
                         'instructions': RULES, 'knowledge': knowledge, 'prompt': prompt}
     native_files = [(p, 'kexing-profile/' + p.relative_to(skill_root).as_posix()) for p in skill_root.rglob('*') if p.is_file()]
     zipped(output / 'platforms/claude/kexing-profile-skill.zip', native_files)
     zipped(output / 'platforms/codex/kexing-profile-skill.zip', native_files)
     write(output, 'adapters.json', json.dumps(configs, ensure_ascii=False, indent=2) + '\n')
-    write(output, '开始使用.html', start_page(configs, RULES, knowledge))
+    write(output, '开始使用.html', start_page(configs, RULES, knowledge, is_public))
     for name in ('PLATFORMS.md', 'LICENSE', 'profile.template.json', 'export_adapters.py'):
         source = ROOT / name
         if source.exists():
@@ -163,11 +245,12 @@ description: "使用用户提供的阶段资料或可幸公开表达规则回看
     write(output, 'profile.public.json' if is_public else 'profile.local.json', profile_path.read_bytes())
     example_dir = output / 'my-wechat-style/references'
     write(example_dir, 'style-examples.md', examples)
+    packages = make_platform_packages(output, configs, knowledge, is_public)
     files = sorted(p for p in output.rglob('*') if p.is_file())
     sums = ''.join(hashlib.sha256(p.read_bytes()).hexdigest() + '  ' + p.relative_to(output).as_posix() + '\n' for p in files)
     write(output, 'SHA256SUMS.txt', sums)
     return {'output': str(output), 'public_profile': is_public, 'platforms': len(configs),
-            'files': len(files) + 1, 'network_requests': 0}
+            'files': len(files) + 1, 'standalone_packages': packages, 'network_requests': 0}
 
 
 def main() -> None:

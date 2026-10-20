@@ -4,15 +4,28 @@
 
 为22岁这一阶段保留一个有时间边界的版本，让相同资料可以在不同平台使用。公开仓库提供表达规则、新写示例、适配程序和教程；私人记忆、人物画像与原始聊天另行保存。
 
-## 不写代码，直接使用
+## 按平台下载：用哪个，下哪个
 
-1. 打开 [多平台下载包](kexing-platform-adapters.zip)，点 **Download raw file** 下载。
-2. 右键ZIP → **全部解压**，进入 `kexing-platform-adapters` 文件夹。
-3. 双击 **开始使用.html**，选平台，点“复制适配文本”，粘贴到新聊天。
+|你用的平台|独立下载|下载后怎么用|
+|---|---|---|
+|ChatGPT|[下载ChatGPT版](https://github.com/fuarnos/kexing/raw/refs/heads/main/kexing-chatgpt.zip)|解压，按包内README添加项目指令和知识文件|
+|Claude|[下载Claude版](https://github.com/fuarnos/kexing/raw/refs/heads/main/kexing-claude.zip)|ZIP可直接上传到Skills；也附Project资料|
+|Gemini|[下载Gemini版](https://github.com/fuarnos/kexing/raw/refs/heads/main/kexing-gemini.zip)|解压，按包内README建立Gem|
+|DeepSeek|[下载DeepSeek版](https://github.com/fuarnos/kexing/raw/refs/heads/main/kexing-deepseek.zip)|解压，复制prompt.txt到新聊天|
+|Kimi|[下载Kimi版](https://github.com/fuarnos/kexing/raw/refs/heads/main/kexing-kimi.zip)|解压，复制prompt.txt到新聊天|
+|豆包|[下载豆包版](https://github.com/fuarnos/kexing/raw/refs/heads/main/kexing-doubao.zip)|解压，复制prompt.txt到新聊天|
+|Grok|[下载Grok版](https://github.com/fuarnos/kexing/raw/refs/heads/main/kexing-grok.zip)|解压，复制prompt.txt到新聊天|
+|Codex|[下载Codex版](https://github.com/fuarnos/kexing/raw/refs/heads/main/kexing-codex.zip)|解压，安装kexing-profile技能文件夹|
+|LM Studio|[下载LM Studio版](https://github.com/fuarnos/kexing/raw/refs/heads/main/kexing-lm-studio.zip)|解压，将system-prompt.txt放进System Prompt|
+|Ollama|[下载Ollama版](https://github.com/fuarnos/kexing/raw/refs/heads/main/kexing-ollama.zip)|解压，按包内README使用Modelfile模板|
+
+每个独立包都有自己的README、离线“开始使用.html”和所需资料，无需先下载完整包。Claude版ZIP本身就是可导入的Skill，不用再拆一层。
 
 每一步点哪里、选哪个文件、如何检查是否生效，都写在 [逐步教程](PLATFORMS.md) 中。也可下载仓库根目录的 [开始使用.html](开始使用.html)，在本地打开；不要把GitHub的HTML源码页当作操作页。
 
 ## 各平台适配
+
+下表是**可选完整包**中的目录；只用一个平台时，直接用上面的独立下载。
 
 |平台|下载包里的文件|使用方式|
 |---|---|---|
@@ -29,6 +42,8 @@
 
 没有专用Skill入口的平台使用可复制文本，不要求安装额外插件。不同模型的回答效果可能不同；教程附人工验收题，没有准确率承诺。
 
+需要全部版本或想研究源码时，可选[下载完整包](https://github.com/fuarnos/kexing/raw/refs/heads/main/kexing-platform-adapters.zip)。完整包的downloads目录也保存了各平台独立ZIP。
+
 ## 源码与二次修改
 
 - [export_adapters.py](export_adapters.py)：离线导出程序，只用Python标准库，不调用模型、不上传资料。
@@ -43,7 +58,7 @@
 python export_adapters.py
 ```
 
-生成结果在 `dist-public`。已有输出目录时换一个新目录，避免覆盖旧版本。自定义私人资料请放在仓库外，并导出到仓库外；详见[教程](PLATFORMS.md)。
+生成结果在 `dist-public`；各平台独立ZIP在 `dist-public/downloads`。已有输出目录时换一个新目录，避免覆盖旧版本。自定义私人资料请放在仓库外，并导出到仓库外；详见[教程](PLATFORMS.md)。
 
 ## 原有技能继续可用
 
