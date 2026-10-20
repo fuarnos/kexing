@@ -1,0 +1,4 @@
+interface:
+  display_name: "可幸 · 微信聊天风格"
+  short_description: "按个人中文聊天风格代拟或改写微信消息，保留原意并随对象与场景调整语气"
+  default_prompt: "用 $my-wechat-style 把这段话改成自然的微信聊天语气，保留原意和承诺范围。"
