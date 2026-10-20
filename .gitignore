@@ -1,0 +1,9 @@
+*
+!/.gitignore
+!/README.md
+!/my-wechat-style/
+!/my-wechat-style/SKILL.md
+!/my-wechat-style/agents/
+!/my-wechat-style/agents/openai.yaml
+!/my-wechat-style/references/
+!/my-wechat-style/references/style-examples.md
