@@ -1,6 +1,15 @@
 *
 !/.gitignore
 !/README.md
+!/LICENSE
+!/PLATFORMS.md
+!/export_adapters.py
+!/profile.public.json
+!/profile.template.json
+!/adapters.json
+!/开始使用.html
+!/kexing-platform-adapters.zip
+!/SHA256SUMS.txt
 !/my-wechat-style/
 !/my-wechat-style/SKILL.md
 !/my-wechat-style/agents/
