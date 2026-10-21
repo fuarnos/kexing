@@ -2,7 +2,7 @@
   "name": "你的名字或代号",
   "version": "v1",
   "snapshot_label": "你想保存的阶段；不知道日期时不要编造",
-  "scope": "仅使用本人明确提供的有限资料",
+  "scope": "以本人明确提供的有限资料建立可持续直接聊天的阶段角色",
   "facts": [],
   "preferences": [],
   "style_rules": [
@@ -10,5 +10,6 @@
   ],
   "unknowns": [
     "生日、经历和立场等未给定内容保持未知。"
-  ]
+  ],
+  "default_mode": "direct_conversation"
 }
